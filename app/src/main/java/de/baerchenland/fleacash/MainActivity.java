@@ -10,13 +10,17 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.GridView;
 
+import java.util.ArrayList;
+import java.util.Locale;
+
 public class MainActivity extends Activity {
 
     public String textAmount = "";
     public String textVendor = "";
     TextView textViewAmount;
     TextView textViewVendor;
-    ListView listView ;
+    ListView listView;
+    ArrayList itemList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,26 +30,19 @@ public class MainActivity extends Activity {
         textViewAmount = (TextView)findViewById(R.id.textViewAmount);
         textViewVendor = (TextView)findViewById(R.id.textViewVendor);
 
-        // Defined Array values to show in ListView
-        String[] values = new String[] { "01:Android List View",
-                "43:10 Euro Adapter implementation",
-                "7:Simple List View In Android",
-                "777:Create List View Android",
-                "3:Android Example",
-                "4:List View Source Code",
-                "5:List View Array Adapter",
-                "6:Android Example List View",
-                "2:Adapter implementation",
-                "7:Simple List View In Android",
-                "8:Create List View Android",
-                "9:Android Example",
-                "12:List View Source Code",
-                "21:List View Array Adapter",
-                "22:Android Example List View"
-        };
-
+        // Array of values to show in ListView
+        itemList = new ArrayList();
+        // some dummy data
+        CashItem cashItem = new CashItem("1",22,2.30);
+        itemList.add(cashItem);
+        itemList.add(new CashItem("2",22,4.00));
+        itemList.add(new CashItem("2",22,7.50));
+        itemList.add(new CashItem("2",2,1.50));
+        itemList.add(new CashItem("2",99,0.50));
         listView = (ListView) findViewById(R.id.listViewAmount);
-        listView.setAdapter(new de.baerchenland.fleacash.ListAdapter(this, values));
+        listView.setAdapter(new de.baerchenland.fleacash.ListAdapter(this, itemList));
+
+        calcItemSum();
     }
 
     @Override
@@ -53,6 +50,20 @@ public class MainActivity extends Activity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    public void calcItemSum() {
+        double sum = 0;
+        int index;
+        CashItem item;
+        for(index = 0; index < itemList.size(); index++)
+        {
+            item = (CashItem)itemList.get(index);
+            sum = sum + item.getAmount();
+        }
+        // set ui
+        TextView textSum = (TextView) findViewById(R.id.textViewSum);
+        textSum.setText(String.format(Locale.GERMAN, "%6.2f", sum));
     }
 
     public void buttonAmountOnClick(View v) {

@@ -7,17 +7,18 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 /**
  * Created by steffen on 18.10.14.
  */
 public class ListAdapter extends BaseAdapter {
 
     Context context;
-    String[] data;
+    ArrayList data;
     private static LayoutInflater inflater = null;
 
-    public ListAdapter(Context context, String[] data) {
-        // TODO Auto-generated constructor stub
+    public ListAdapter(Context context, ArrayList data) {
         this.context = context;
         this.data = data;
         inflater = (LayoutInflater) context
@@ -26,33 +27,31 @@ public class ListAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        // TODO Auto-generated method stub
-        return data.length;
+        return data.size();
     }
 
     @Override
     public Object getItem(int position) {
-        // TODO Auto-generated method stub
-        return data[position];
+        return data.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-        // TODO Auto-generated method stub
         return position;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        // TODO Auto-generated method stub
         View vi = convertView;
         if (vi == null)
             vi = inflater.inflate(R.layout.list_row, null);
-        String[] parts = data[position].split(":");
+        // get object at position
+        CashItem cashItem = (CashItem) data.get(position);
+        // fill list item
         TextView textNo = (TextView) vi.findViewById(R.id.textNo);
-        textNo.setText(parts[0]);
+        textNo.setText(cashItem.getVendorFormated());
         TextView textItem = (TextView) vi.findViewById(R.id.textItem);
-        textItem.setText(parts[1]);
+        textItem.setText(cashItem.getAmountFormated());
         return vi;
     }
 }
