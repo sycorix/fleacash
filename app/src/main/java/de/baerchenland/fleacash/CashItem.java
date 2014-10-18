@@ -38,7 +38,7 @@ public class CashItem {
     }
 
     public String getVendorFormated() {
-        return String.format("%2d", this._vendor);
+        return String.format("%3d", this._vendor);
     }
 
     public void setAmount(double amount) {
@@ -51,6 +51,10 @@ public class CashItem {
 
     public String getAmountFormated() {
         return String.format(Locale.GERMAN, "%6.2f", this._amount);
+    }
+
+    public String getInfo() {
+        return this._id + "  - " + this.getVendorFormated() + "  - " + this.getAmountFormated();
     }
 
 }

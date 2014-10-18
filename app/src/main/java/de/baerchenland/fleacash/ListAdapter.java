@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -54,4 +55,5 @@ public class ListAdapter extends BaseAdapter {
         textItem.setText(cashItem.getAmountFormated());
         return vi;
     }
+
 }
