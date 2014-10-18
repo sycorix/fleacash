@@ -1,13 +1,18 @@
 package de.baerchenland.fleacash;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.GridView;
 import android.widget.Toast;
@@ -25,6 +30,11 @@ public class MainActivity extends Activity {
     TextView textViewVendor;
     ListView listView;
     ArrayList itemList;
+    CashItem cashItem;
+    String itemTimeStamp;
+    ListAdapter listAdapter;
+    PopupWindow removeItemPopup;
+    Button btnClosePopup;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +46,7 @@ public class MainActivity extends Activity {
 
         // Array of values to show in ListView
         itemList = new ArrayList();
+        /*
         // some dummy data
         String timeStamp = getCurrentTimeStamp();
         CashItem cashItem = new CashItem(timeStamp,22,2.30);
@@ -44,15 +55,18 @@ public class MainActivity extends Activity {
         itemList.add(new CashItem(timeStamp,22,7.50));
         itemList.add(new CashItem(timeStamp,2,1.50));
         itemList.add(new CashItem(timeStamp,99,0.50));
+        */
+        listAdapter = new de.baerchenland.fleacash.ListAdapter(this, itemList);
         listView = (ListView) findViewById(R.id.listViewAmount);
-        listView.setAdapter(new de.baerchenland.fleacash.ListAdapter(this, itemList));
+        listView.setAdapter(listAdapter);
         // listening to single list item on click
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
                 // get selected item
                 CashItem cashItem = (CashItem)parent.getItemAtPosition(position);
-                Toast.makeText(getBaseContext(), (CharSequence) cashItem.getInfo(), Toast.LENGTH_SHORT).show();
+                initiatePopupWindow(cashItem.getInfo());
+//                Toast.makeText(getBaseContext(), (CharSequence) cashItem.getInfo(), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -126,6 +140,15 @@ public class MainActivity extends Activity {
             case R.id.button1cl:
                 textAmount = "";
                 break;
+            case R.id.button1o: // Ok
+                if (textAmount.length() > 0) {
+                    cashItem.setAmount(Double.parseDouble(textAmount));
+                    itemList.add(cashItem);
+                    listAdapter.notifyDataSetChanged(); // update ui
+                    calcItemSum();
+                }
+                textAmount = "";
+                break;
         }
 
         textViewAmount.setText(textAmount);
@@ -168,10 +191,46 @@ public class MainActivity extends Activity {
             case R.id.button0cl:
                 textVendor = "";
                 break;
+            case R.id.button0o: // Ok
+                if (textVendor.length() > 0) {
+                    // TODO change time stamp only on new transaction
+                    itemTimeStamp = getCurrentTimeStamp();
+                    cashItem = new CashItem(itemTimeStamp, Integer.parseInt(textVendor),0);
+                }
+                textVendor = "";
+                break;
         }
 
         textViewVendor.setText(textVendor);
     }
+
+    private void initiatePopupWindow(String cashItemText) {
+        try {
+            //TODO: try AlertDialog.Builder instead
+            // We need to get the instance of the LayoutInflater
+            LayoutInflater inflater = (LayoutInflater) MainActivity.this
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View layout = inflater.inflate(R.layout.remove_item,
+                    (ViewGroup) findViewById(R.id.remove_item_element));
+            removeItemPopup = new PopupWindow(layout, 500, 570, true);
+            removeItemPopup.showAtLocation(layout, Gravity.CENTER, 0, 0);
+
+            TextView itemText = (TextView) layout.findViewById(R.id.txtViewItem);
+            itemText.setText(cashItemText);
+
+            btnClosePopup = (Button) layout.findViewById(R.id.btn_close_popup);
+            btnClosePopup.setOnClickListener(cancel_button_click_listener);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private View.OnClickListener cancel_button_click_listener = new View.OnClickListener() {
+        public void onClick(View v) {
+            removeItemPopup.dismiss();
+        }
+    };
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
