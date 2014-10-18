@@ -40,6 +40,8 @@ public class MainActivity extends Activity {
     PopupWindow removeItemPopup;
     Button btnClosePopup;
     NumberFormat numberFormat;
+    Boolean vendorKey;
+    Boolean itemDone;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +79,9 @@ public class MainActivity extends Activity {
             }
         });
 
-        calcItemSum();
+        // calcItemSum();
+        vendorKey = false;
+        itemDone = false;
     }
 
     @Override
@@ -109,40 +113,52 @@ public class MainActivity extends Activity {
 
     public void buttonAmountOnClick(View v) {
         Button button=(Button) v;
+        Boolean numberEntry = false;
 
         switch(button.getId()) {
             case R.id.button10:
                 textAmount += "0";
+                numberEntry = true;
                 break;
             case R.id.button11:
                 textAmount += "1";
+                numberEntry = true;
                 break;
             case R.id.button12:
                 textAmount += "2";
+                numberEntry = true;
                 break;
             case R.id.button13:
                 textAmount += "3";
+                numberEntry = true;
                 break;
             case R.id.button14:
                 textAmount += "4";
+                numberEntry = true;
                 break;
             case R.id.button15:
                 textAmount += "5";
+                numberEntry = true;
                 break;
             case R.id.button16:
                 textAmount += "6";
+                numberEntry = true;
                 break;
             case R.id.button17:
                 textAmount += "7";
+                numberEntry = true;
                 break;
             case R.id.button18:
                 textAmount += "8";
+                numberEntry = true;
                 break;
             case R.id.button19:
                 textAmount += "9";
+                numberEntry = true;
                 break;
             case R.id.button1c:
                 textAmount += ",";
+                numberEntry = true;
                 break;
             case R.id.button1cl:
                 textAmount = "";
@@ -150,18 +166,31 @@ public class MainActivity extends Activity {
             case R.id.button1o: // Ok
                 if (textAmount.length() > 0) {
                     Number number;
+                    double amount;
                     try {
-                       number = numberFormat.parse(textAmount);
+                        number = numberFormat.parse(textAmount);
+                        amount = number.doubleValue();
                     } catch (Exception e) {
-                       number = 0;
+                        amount = 0;
                     }
-                    cashItem.setAmount(number.doubleValue());
+                    cashItem.setAmount(amount);
                     itemList.add(cashItem);
                     listAdapter.notifyDataSetChanged(); // update ui
                     calcItemSum();
+                    itemDone = true;
                 }
                 textAmount = "";
                 break;
+        }
+
+        if(numberEntry && vendorKey) {
+            if (textVendor.length() > 0) {
+                // TODO change time stamp only on new transaction
+                itemTimeStamp = getCurrentTimeStamp();
+                cashItem = new CashItem(itemTimeStamp, Integer.parseInt(textVendor),0);
+            }
+            textVendor = "";
+            vendorKey = false;
         }
 
         textViewAmount.setText(textAmount);
@@ -170,39 +199,55 @@ public class MainActivity extends Activity {
     public void buttonVendorOnClick(View v) {
         Button button=(Button) v;
 
+        if (itemDone) {
+            itemDone = false;
+            textVendor = "";
+            //TODO only if numbers are pressed
+        }
         switch(button.getId()) {
             case R.id.button00:
                 textVendor += "0";
+                vendorKey = true;
                 break;
             case R.id.button01:
                 textVendor += "1";
+                vendorKey = true;
                 break;
             case R.id.button02:
                 textVendor += "2";
+                vendorKey = true;
                 break;
             case R.id.button03:
                 textVendor += "3";
+                vendorKey = true;
                 break;
             case R.id.button04:
                 textVendor += "4";
+                vendorKey = true;
                 break;
             case R.id.button05:
                 textVendor += "5";
+                vendorKey = true;
                 break;
             case R.id.button06:
                 textVendor += "6";
+                vendorKey = true;
                 break;
             case R.id.button07:
                 textVendor += "7";
+                vendorKey = true;
                 break;
             case R.id.button08:
                 textVendor += "8";
+                vendorKey = true;
                 break;
             case R.id.button09:
                 textVendor += "9";
+                vendorKey = true;
                 break;
             case R.id.button0cl:
                 textVendor = "";
+                vendorKey = false;
                 break;
             case R.id.button0o: // Ok
                 if (textVendor.length() > 0) {
@@ -210,7 +255,8 @@ public class MainActivity extends Activity {
                     itemTimeStamp = getCurrentTimeStamp();
                     cashItem = new CashItem(itemTimeStamp, Integer.parseInt(textVendor),0);
                 }
-                textVendor = "";
+                //textVendor = "";
+                vendorKey = false;
                 break;
         }
 
@@ -219,24 +265,7 @@ public class MainActivity extends Activity {
 
     private void deleteCashItemPopup(final CashItem cashItem) {
         try {
-        /*
-            //TODO: try AlertDialog.Builder instead
-            // We need to get the instance of the LayoutInflater
-            LayoutInflater inflater = (LayoutInflater) MainActivity.this
-                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View layout = inflater.inflate(R.layout.remove_item,
-                    (ViewGroup) findViewById(R.id.remove_item_element));
-            removeItemPopup = new PopupWindow(layout, 500, 570, true);
-            removeItemPopup.showAtLocation(layout, Gravity.CENTER, 0, 0);
-
-            TextView itemText = (TextView) layout.findViewById(R.id.txtViewItem);
-            itemText.setText(cashItemText);
-
-            btnClosePopup = (Button) layout.findViewById(R.id.btn_close_popup);
-            btnClosePopup.setOnClickListener(cancel_button_click_listener);
-        */
             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-
             // set title
             alertDialogBuilder.setTitle("Eintrag löschen?");
             // set dialog message
@@ -268,13 +297,7 @@ public class MainActivity extends Activity {
             e.printStackTrace();
         }
     }
-/*
-    private View.OnClickListener cancel_button_click_listener = new View.OnClickListener() {
-        public void onClick(View v) {
-            removeItemPopup.dismiss();
-        }
-    };
-*/
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
