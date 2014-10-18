@@ -1,7 +1,9 @@
 package de.baerchenland.fleacash;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -17,6 +19,7 @@ import android.widget.TextView;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,6 +27,7 @@ import java.util.Locale;
 
 public class MainActivity extends Activity {
 
+    final Context context = this;
     public String textAmount = "";
     public String textVendor = "";
     TextView textViewAmount;
@@ -35,6 +39,7 @@ public class MainActivity extends Activity {
     ListAdapter listAdapter;
     PopupWindow removeItemPopup;
     Button btnClosePopup;
+    NumberFormat numberFormat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +48,8 @@ public class MainActivity extends Activity {
 
         textViewAmount = (TextView)findViewById(R.id.textViewAmount);
         textViewVendor = (TextView)findViewById(R.id.textViewVendor);
+
+        numberFormat = NumberFormat.getInstance(Locale.GERMAN);
 
         // Array of values to show in ListView
         itemList = new ArrayList();
@@ -65,7 +72,7 @@ public class MainActivity extends Activity {
                                     int position, long id) {
                 // get selected item
                 CashItem cashItem = (CashItem)parent.getItemAtPosition(position);
-                initiatePopupWindow(cashItem.getInfo());
+                deleteCashItemPopup(cashItem);
 //                Toast.makeText(getBaseContext(), (CharSequence) cashItem.getInfo(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -142,7 +149,13 @@ public class MainActivity extends Activity {
                 break;
             case R.id.button1o: // Ok
                 if (textAmount.length() > 0) {
-                    cashItem.setAmount(Double.parseDouble(textAmount));
+                    Number number;
+                    try {
+                       number = numberFormat.parse(textAmount);
+                    } catch (Exception e) {
+                       number = 0;
+                    }
+                    cashItem.setAmount(number.doubleValue());
                     itemList.add(cashItem);
                     listAdapter.notifyDataSetChanged(); // update ui
                     calcItemSum();
@@ -204,8 +217,9 @@ public class MainActivity extends Activity {
         textViewVendor.setText(textVendor);
     }
 
-    private void initiatePopupWindow(String cashItemText) {
+    private void deleteCashItemPopup(final CashItem cashItem) {
         try {
+        /*
             //TODO: try AlertDialog.Builder instead
             // We need to get the instance of the LayoutInflater
             LayoutInflater inflater = (LayoutInflater) MainActivity.this
@@ -220,18 +234,47 @@ public class MainActivity extends Activity {
 
             btnClosePopup = (Button) layout.findViewById(R.id.btn_close_popup);
             btnClosePopup.setOnClickListener(cancel_button_click_listener);
+        */
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
 
+            // set title
+            alertDialogBuilder.setTitle("Eintrag löschen?");
+            // set dialog message
+            alertDialogBuilder
+                    .setMessage(cashItem.getInfo())
+                    .setCancelable(false)
+                    .setPositiveButton("Ja",new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog,int id) {
+                            // if this button is clicked, close
+                            // current activity
+                            itemList.remove(cashItem);
+                            listAdapter.notifyDataSetChanged(); // update ui
+                            calcItemSum();
+                            dialog.cancel();
+                        }
+                    })
+                    .setNegativeButton("Nein",new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog,int id) {
+                            // if this button is clicked, just close
+                            // the dialog box and do nothing
+                            dialog.cancel();
+                        }
+                    });
+            // create alert dialog
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            // show it
+            alertDialog.show();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
+/*
     private View.OnClickListener cancel_button_click_listener = new View.OnClickListener() {
         public void onClick(View v) {
             removeItemPopup.dismiss();
         }
     };
-
+*/
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
