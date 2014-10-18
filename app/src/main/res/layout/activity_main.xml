@@ -25,11 +25,12 @@
             android:layout_weight="2"
             android:id="@+id/linearLayoutList">
 
-            <GridView
-                android:layout_width="wrap_content"
+            <ListView
+                android:id="@+id/listViewAmount"
                 android:layout_height="0dp"
-                android:id="@+id/gridViewAmount"
-                android:layout_weight="0.9" />
+                android:layout_width="match_parent"
+                android:layout_weight="0.9">
+            </ListView>
 
             <LinearLayout
                 android:orientation="horizontal"
@@ -39,29 +40,29 @@
                 android:id="@+id/linearLayoutSum"
                 android:layout_weight="0.1">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="22,50"
-                    android:id="@+id/textViewSum"
-                    android:layout_weight="1" />
-
                 <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Ok"
                     android:id="@+id/buttonOk"
-                    android:layout_weight="1" />
+                    android:layout_weight="0.4" />
 
                 <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Storno"
                     android:id="@+id/buttonCancel"
-                    android:layout_marginLeft="100dp"
-                    android:layout_gravity="right"
-                    android:layout_weight="1" />
+                    android:layout_weight="0.2" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="22,50"
+                    android:gravity="right"
+                    android:id="@+id/textViewSum"
+                    android:layout_weight="0.4" />
+
             </LinearLayout>
 
         </LinearLayout>
@@ -116,7 +117,7 @@
                         android:text="C"
                         android:id="@+id/button0cl"
                         android:layout_weight="1"
-                        android:layout_column="3"
+                        android:layout_column="2"
                         android:onClick="buttonVendorOnClick"
                         android:clickable="true"/>
 

@@ -6,6 +6,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.GridView;
 
@@ -15,6 +16,7 @@ public class MainActivity extends Activity {
     public String textVendor = "";
     TextView textViewAmount;
     TextView textViewVendor;
+    ListView listView ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +25,27 @@ public class MainActivity extends Activity {
 
         textViewAmount = (TextView)findViewById(R.id.textViewAmount);
         textViewVendor = (TextView)findViewById(R.id.textViewVendor);
+
+        // Defined Array values to show in ListView
+        String[] values = new String[] { "01:Android List View",
+                "43:10 Euro Adapter implementation",
+                "7:Simple List View In Android",
+                "777:Create List View Android",
+                "3:Android Example",
+                "4:List View Source Code",
+                "5:List View Array Adapter",
+                "6:Android Example List View",
+                "2:Adapter implementation",
+                "7:Simple List View In Android",
+                "8:Create List View Android",
+                "9:Android Example",
+                "12:List View Source Code",
+                "21:List View Array Adapter",
+                "22:Android Example List View"
+        };
+
+        listView = (ListView) findViewById(R.id.listViewAmount);
+        listView.setAdapter(new de.baerchenland.fleacash.ListAdapter(this, values));
     }
 
     @Override
