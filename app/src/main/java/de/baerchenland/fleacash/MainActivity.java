@@ -40,8 +40,9 @@ public class MainActivity extends Activity {
     PopupWindow removeItemPopup;
     Button btnClosePopup;
     NumberFormat numberFormat;
-    Boolean vendorKey;
+    Boolean vendorNumKey;
     Boolean itemDone;
+    Boolean freshItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,16 +56,7 @@ public class MainActivity extends Activity {
 
         // Array of values to show in ListView
         itemList = new ArrayList();
-        /*
-        // some dummy data
-        String timeStamp = getCurrentTimeStamp();
-        CashItem cashItem = new CashItem(timeStamp,22,2.30);
-        itemList.add(cashItem);
-        itemList.add(new CashItem(timeStamp,22,4.00));
-        itemList.add(new CashItem(timeStamp,22,7.50));
-        itemList.add(new CashItem(timeStamp,2,1.50));
-        itemList.add(new CashItem(timeStamp,99,0.50));
-        */
+
         listAdapter = new de.baerchenland.fleacash.ListAdapter(this, itemList);
         listView = (ListView) findViewById(R.id.listViewAmount);
         listView.setAdapter(listAdapter);
@@ -75,13 +67,13 @@ public class MainActivity extends Activity {
                 // get selected item
                 CashItem cashItem = (CashItem)parent.getItemAtPosition(position);
                 deleteCashItemPopup(cashItem);
-//                Toast.makeText(getBaseContext(), (CharSequence) cashItem.getInfo(), Toast.LENGTH_SHORT).show();
+                // Toast.makeText(getBaseContext(), (CharSequence) cashItem.getInfo(), Toast.LENGTH_SHORT).show();
             }
         });
 
-        // calcItemSum();
-        vendorKey = false;
+        vendorNumKey = false;
         itemDone = false;
+        freshItem = false;
     }
 
     @Override
@@ -109,6 +101,87 @@ public class MainActivity extends Activity {
         Date date = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
         return (sdf.format(date));
+    }
+
+    public void buttonVendorOnClick(View v) {
+        Button button=(Button) v;
+        Boolean okKey = false;
+        String textVendorTmp = textVendor;
+
+        if (itemDone) {
+            itemDone = false;
+            textVendorTmp = "";
+        }
+        switch(button.getId()) {
+            case R.id.button00:
+                textVendorTmp += "0";
+                vendorNumKey = true;
+                break;
+            case R.id.button01:
+                textVendorTmp += "1";
+                vendorNumKey = true;
+                break;
+            case R.id.button02:
+                textVendorTmp += "2";
+                vendorNumKey = true;
+                break;
+            case R.id.button03:
+                textVendorTmp += "3";
+                vendorNumKey = true;
+                break;
+            case R.id.button04:
+                textVendorTmp += "4";
+                vendorNumKey = true;
+                break;
+            case R.id.button05:
+                textVendorTmp += "5";
+                vendorNumKey = true;
+                break;
+            case R.id.button06:
+                textVendorTmp += "6";
+                vendorNumKey = true;
+                break;
+            case R.id.button07:
+                textVendorTmp += "7";
+                vendorNumKey = true;
+                break;
+            case R.id.button08:
+                textVendorTmp += "8";
+                vendorNumKey = true;
+                break;
+            case R.id.button09:
+                textVendorTmp += "9";
+                vendorNumKey = true;
+                break;
+            case R.id.button0cl:
+                textVendor = "";
+                vendorNumKey = false;
+                break;
+            case R.id.button0o: // Ok
+                if (textVendor.length() > 0) {
+                    okKey = true;
+                }
+                vendorNumKey = false;
+                break;
+        }
+        if (vendorNumKey) {
+            textVendor = textVendorTmp;
+        }
+        if (okKey) {
+            // TODO change time stamp only on new transaction
+            itemTimeStamp = getCurrentTimeStamp();
+            cashItem = new CashItem(itemTimeStamp, Integer.parseInt(textVendor),0);
+            freshItem = true;
+            if (textAmount.length() > 0) {
+                cashItem.setAmount(convert(textAmount));
+                itemList.add(cashItem);
+                listAdapter.notifyDataSetChanged(); // update ui
+                calcItemSum();
+                itemDone = true;
+                freshItem = false;
+            }
+        }
+        textViewVendor.setText(textVendor);
     }
 
     public void buttonAmountOnClick(View v) {
@@ -157,110 +230,62 @@ public class MainActivity extends Activity {
                 numberEntry = true;
                 break;
             case R.id.button1c:
-                textAmount += ",";
-                numberEntry = true;
+                if (!textAmount.contains(",")) {
+                    textAmount += ",";
+                    numberEntry = true;
+                }
                 break;
             case R.id.button1cl:
                 textAmount = "";
                 break;
             case R.id.button1o: // Ok
-                if (textAmount.length() > 0) {
-                    Number number;
-                    double amount;
-                    try {
-                        number = numberFormat.parse(textAmount);
-                        amount = number.doubleValue();
-                    } catch (Exception e) {
-                        amount = 0;
+                if (textAmount.length() > 0 && textVendor.length() > 0) {
+                    if (!freshItem) { // vendor method created item already
+                        // TODO change time stamp only on new transaction
+                        itemTimeStamp = getCurrentTimeStamp();
+                        cashItem = new CashItem(itemTimeStamp, Integer.parseInt(textVendor),0);
                     }
-                    cashItem.setAmount(amount);
+                    cashItem.setAmount(convert(textAmount));
                     itemList.add(cashItem);
                     listAdapter.notifyDataSetChanged(); // update ui
                     calcItemSum();
                     itemDone = true;
+                    freshItem = false;
+                    textAmount = "";
                 }
-                textAmount = "";
                 break;
         }
-
-        if(numberEntry && vendorKey) {
+/*
+        if(numberEntry && vendorNumKey) {
             if (textVendor.length() > 0) {
                 // TODO change time stamp only on new transaction
                 itemTimeStamp = getCurrentTimeStamp();
                 cashItem = new CashItem(itemTimeStamp, Integer.parseInt(textVendor),0);
             }
             textVendor = "";
-            vendorKey = false;
+            vendorNumKey = false;
         }
-
+*/
         textViewAmount.setText(textAmount);
     }
 
-    public void buttonVendorOnClick(View v) {
-        Button button=(Button) v;
-
-        if (itemDone) {
-            itemDone = false;
-            textVendor = "";
-            //TODO only if numbers are pressed
+    private double convert(String textAmount) {
+        Number number;
+        double amount;
+        try {
+            number = numberFormat.parse(textAmount);
+            amount = number.doubleValue();
+        } catch (Exception e) {
+            amount = 0;
         }
-        switch(button.getId()) {
-            case R.id.button00:
-                textVendor += "0";
-                vendorKey = true;
-                break;
-            case R.id.button01:
-                textVendor += "1";
-                vendorKey = true;
-                break;
-            case R.id.button02:
-                textVendor += "2";
-                vendorKey = true;
-                break;
-            case R.id.button03:
-                textVendor += "3";
-                vendorKey = true;
-                break;
-            case R.id.button04:
-                textVendor += "4";
-                vendorKey = true;
-                break;
-            case R.id.button05:
-                textVendor += "5";
-                vendorKey = true;
-                break;
-            case R.id.button06:
-                textVendor += "6";
-                vendorKey = true;
-                break;
-            case R.id.button07:
-                textVendor += "7";
-                vendorKey = true;
-                break;
-            case R.id.button08:
-                textVendor += "8";
-                vendorKey = true;
-                break;
-            case R.id.button09:
-                textVendor += "9";
-                vendorKey = true;
-                break;
-            case R.id.button0cl:
-                textVendor = "";
-                vendorKey = false;
-                break;
-            case R.id.button0o: // Ok
-                if (textVendor.length() > 0) {
-                    // TODO change time stamp only on new transaction
-                    itemTimeStamp = getCurrentTimeStamp();
-                    cashItem = new CashItem(itemTimeStamp, Integer.parseInt(textVendor),0);
-                }
-                //textVendor = "";
-                vendorKey = false;
-                break;
-        }
+        return amount;
+    }
 
-        textViewVendor.setText(textVendor);
+    public void buttonCancelOnClick(View v) {
+        Button button = (Button) v;
+        itemList.clear();
+        listAdapter.notifyDataSetChanged(); // update ui
+        calcItemSum();
     }
 
     private void deleteCashItemPopup(final CashItem cashItem) {
