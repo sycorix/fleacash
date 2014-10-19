@@ -7,7 +7,7 @@ import java.util.Locale;
  */
 public class CashItem {
 
-    private String _id;
+    private String _timestamp;
     private int _vendor;
     private double _amount;
 
@@ -15,18 +15,18 @@ public class CashItem {
 
     }
 
-    public CashItem(String id, int vendor, double amount) {
-        this._id = id;
+    public CashItem(String timestamp, int vendor, double amount) {
+        this._timestamp = timestamp;
         this._vendor = vendor;
         this._amount = amount;
     }
 
-    public void setId(String id) {
-        this._id = id;
+    public void setTimestamp(String timestamp) {
+        this._timestamp = timestamp;
     }
 
-    public String getId() {
-        return this._id;
+    public String getTimestamp() {
+        return this._timestamp;
     }
 
     public void setVendor(int vendor) {
@@ -54,7 +54,7 @@ public class CashItem {
     }
 
     public String getInfo() {
-        return this._id + "  - " + this.getVendorFormated() + "  - " + this.getAmountFormated();
+        return this.getVendorFormated() + ":   " + this.getAmountFormated() + "   (" + this._timestamp + " )" ;
     }
 
 }

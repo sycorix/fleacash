@@ -282,7 +282,22 @@ public class MainActivity extends Activity {
     }
 
     public void buttonCancelOnClick(View v) {
-        Button button = (Button) v;
+        itemList.clear();
+        listAdapter.notifyDataSetChanged(); // update ui
+        calcItemSum();
+    }
+
+    public void buttonSaveOnClick(View v) {
+        DBHandler dbHandler = new DBHandler(this, null, null, 1);
+        int index;
+        CashItem item;
+        // save item list to db
+        for(index = 0; index < itemList.size(); index++)
+        {
+            item = (CashItem)itemList.get(index);
+            dbHandler.addCashItem(item);
+        }
+        // clear item list
         itemList.clear();
         listAdapter.notifyDataSetChanged(); // update ui
         calcItemSum();

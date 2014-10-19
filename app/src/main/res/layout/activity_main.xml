@@ -43,8 +43,9 @@
                 <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Ok"
-                    android:id="@+id/buttonOk"
+                    android:text="Speichern &amp; Neu"
+                    android:id="@+id/buttonSave"
+                    android:onClick="buttonSaveOnClick"
                     android:layout_weight="0.4" />
 
                 <Button
