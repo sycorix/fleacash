@@ -19,10 +19,10 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "fleacashDB.db";
     private static final String TABLE_CASHITEMS = "cashitems";
 
-    public static final String COLUMN_ID = "_id";
-    public static final String COLUMN_VENDOR = "vendor";
-    public static final String COLUMN_AMOUNT = "amount";
-    public static final String COLUMN_TIMESTAMP = "timestamp";
+    public static final String COLUMN_ID = "_id";              // INTEGER
+    public static final String COLUMN_VENDOR = "vendor";       // INTEGER   (Integer)
+    public static final String COLUMN_AMOUNT = "amount";       // REAL      (double)
+    public static final String COLUMN_TIMESTAMP = "timestamp"; // STRING    (String)
 
     public DBHandler(Context context, String name,
                        SQLiteDatabase.CursorFactory factory, int version) {
@@ -58,19 +58,6 @@ public class DBHandler extends SQLiteOpenHelper {
         db.close();
     }
 
-    public double convert(String textAmount) {
-        NumberFormat numberFormat = NumberFormat.getInstance(Locale.GERMAN);
-        Number number;
-        double amount;
-        try {
-            number = numberFormat.parse(textAmount);
-            amount = number.doubleValue();
-        } catch (Exception e) {
-            amount = 0;
-        }
-        return amount;
-    }
-
     public ArrayList getVendorSums() {
         ArrayList vendorSumList = new ArrayList();
         CashItem vendorSum;
@@ -81,7 +68,7 @@ public class DBHandler extends SQLiteOpenHelper {
         index = 0;
         while(cursor.moveToNext()) {
             index++;
-            vendorSum = new CashItem(index.toString(), Integer.parseInt(cursor.getString(0)),convert(cursor.getString(1)));
+            vendorSum = new CashItem(index.toString(), cursor.getInt(0), cursor.getDouble(1));
             vendorSumList.add(vendorSum);
         }
         db.close();
