@@ -2,8 +2,13 @@ package de.baerchenland.fleacash;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  * Created by steffen on 19.10.14.
@@ -40,16 +45,46 @@ public class DBHandler extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public void addCashItem(CashItem cashItem) {
+    public void addCashItem(CashItem cashItem, String timeStamp) {
 
         ContentValues values = new ContentValues();
         values.put(COLUMN_VENDOR, cashItem.getVendor());
         values.put(COLUMN_AMOUNT, cashItem.getAmount());
-        values.put(COLUMN_TIMESTAMP, cashItem.getTimestamp());
+        values.put(COLUMN_TIMESTAMP, timeStamp);
 
         SQLiteDatabase db = this.getWritableDatabase();
 
         db.insert(TABLE_CASHITEMS, null, values);
         db.close();
+    }
+
+    public double convert(String textAmount) {
+        NumberFormat numberFormat = NumberFormat.getInstance(Locale.GERMAN);
+        Number number;
+        double amount;
+        try {
+            number = numberFormat.parse(textAmount);
+            amount = number.doubleValue();
+        } catch (Exception e) {
+            amount = 0;
+        }
+        return amount;
+    }
+
+    public ArrayList getVendorSums() {
+        ArrayList vendorSumList = new ArrayList();
+        CashItem vendorSum;
+        Integer index;
+        String query = "SELECT " +  COLUMN_VENDOR + ", SUM(" + COLUMN_AMOUNT +") FROM " + TABLE_CASHITEMS + " GROUP BY " + COLUMN_VENDOR + " ORDER BY " +COLUMN_VENDOR;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        index = 0;
+        while(cursor.moveToNext()) {
+            index++;
+            vendorSum = new CashItem(index.toString(), Integer.parseInt(cursor.getString(0)),convert(cursor.getString(1)));
+            vendorSumList.add(vendorSum);
+        }
+        db.close();
+        return vendorSumList;
     }
 }

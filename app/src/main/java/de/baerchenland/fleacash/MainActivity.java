@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.PopupWindow;
@@ -255,21 +256,11 @@ public class MainActivity extends Activity {
                 }
                 break;
         }
-/*
-        if(numberEntry && vendorNumKey) {
-            if (textVendor.length() > 0) {
-                // TODO change time stamp only on new transaction
-                itemTimeStamp = getCurrentTimeStamp();
-                cashItem = new CashItem(itemTimeStamp, Integer.parseInt(textVendor),0);
-            }
-            textVendor = "";
-            vendorNumKey = false;
-        }
-*/
+
         textViewAmount.setText(textAmount);
     }
 
-    private double convert(String textAmount) {
+    public double convert(String textAmount) {
         Number number;
         double amount;
         try {
@@ -291,11 +282,13 @@ public class MainActivity extends Activity {
         DBHandler dbHandler = new DBHandler(this, null, null, 1);
         int index;
         CashItem item;
+        String timeStamp;
         // save item list to db
+        timeStamp = getCurrentTimeStamp();
         for(index = 0; index < itemList.size(); index++)
         {
             item = (CashItem)itemList.get(index);
-            dbHandler.addCashItem(item);
+            dbHandler.addCashItem(item, timeStamp);
         }
         // clear item list
         itemList.clear();
@@ -338,13 +331,71 @@ public class MainActivity extends Activity {
         }
     }
 
+    private void calcShowSumsByVendor() {
+        DBHandler dbHandler = new DBHandler(this, null, null, 1);
+        ArrayList vendorItems;
+        Integer index;
+        CashItem item;
+
+        // get list of calculated sums
+        vendorItems = dbHandler.getVendorSums();
+
+        // build popup dialog and show
+        AlertDialog.Builder builderSingle;
+        builderSingle = new AlertDialog.Builder(MainActivity.this);
+        builderSingle.setIcon(R.drawable.ic_launcher);
+        builderSingle.setTitle("Summe pro Verkäufer");
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
+            MainActivity.this,
+            android.R.layout.select_dialog_singlechoice);
+
+        for(index = 0; index < vendorItems.size(); index++)
+        {
+            item = (CashItem)vendorItems.get(index);
+            arrayAdapter.add(item.getShortInfo());
+        }
+
+        builderSingle.setNegativeButton("Ok",
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                }
+            });
+
+        builderSingle.setAdapter(arrayAdapter,
+            new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    String strName = arrayAdapter.getItem(which);
+                    AlertDialog.Builder builderInner = new AlertDialog.Builder(
+                        MainActivity.this);
+                    builderInner.setMessage(strName);
+                    builderInner.setTitle("Verkäufer");
+                    builderInner.setPositiveButton("Ok",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(
+                                DialogInterface dialog,
+                                int which) {
+                                    dialog.dismiss();
+                            }
+                        });
+                    builderInner.show();
+                }
+            });
+
+        builderSingle.show();
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_sums) {
+            calcShowSumsByVendor();
             return true;
         }
         return super.onOptionsItemSelected(item);

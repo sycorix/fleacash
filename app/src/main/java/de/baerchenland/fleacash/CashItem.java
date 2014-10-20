@@ -57,4 +57,7 @@ public class CashItem {
         return this.getVendorFormated() + ":   " + this.getAmountFormated() + "   (" + this._timestamp + " )" ;
     }
 
+    public String getShortInfo() {
+        return this.getVendorFormated() + ":   " + this.getAmountFormated();
+    }
 }
