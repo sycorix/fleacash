@@ -169,8 +169,7 @@ public class MainActivity extends Activity {
             textVendor = textVendorTmp;
         }
         if (okKey) {
-            // TODO change time stamp only on new transaction
-            itemTimeStamp = getCurrentTimeStamp();
+            itemTimeStamp = getCurrentTimeStamp(); // temp. timestamp
             cashItem = new CashItem(itemTimeStamp, Integer.parseInt(textVendor),0);
             freshItem = true;
             if (textAmount.length() > 0) {
@@ -180,6 +179,9 @@ public class MainActivity extends Activity {
                 calcItemSum();
                 itemDone = true;
                 freshItem = false;
+                textAmount = ""; // clear all input fields
+                textVendor = "";
+                textViewAmount.setText(textAmount);
             }
         }
         textViewVendor.setText(textVendor);
@@ -242,8 +244,7 @@ public class MainActivity extends Activity {
             case R.id.button1o: // Ok
                 if (textAmount.length() > 0 && textVendor.length() > 0) {
                     if (!freshItem) { // vendor method created item already
-                        // TODO change time stamp only on new transaction
-                        itemTimeStamp = getCurrentTimeStamp();
+                        itemTimeStamp = getCurrentTimeStamp(); // temp. timestamp
                         cashItem = new CashItem(itemTimeStamp, Integer.parseInt(textVendor),0);
                     }
                     cashItem.setAmount(convert(textAmount));
@@ -252,7 +253,9 @@ public class MainActivity extends Activity {
                     calcItemSum();
                     itemDone = true;
                     freshItem = false;
-                    textAmount = "";
+                    textAmount = ""; // clear all input fields
+                    textVendor = "";
+                    textViewVendor.setText(textVendor);
                 }
                 break;
         }
