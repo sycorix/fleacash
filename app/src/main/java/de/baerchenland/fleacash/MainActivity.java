@@ -20,6 +20,8 @@ import android.widget.TextView;
 import android.widget.GridView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -391,6 +393,26 @@ public class MainActivity extends Activity {
         builderSingle.show();
     }
 
+    private void exportDBToCsv() {
+        DBExport dbExport = new DBExport();
+        if (dbExport.isExternalStorageWritable()) {
+            try {
+                // make new file
+                File file = new File(dbExport.fileName);
+                file.createNewFile();
+                /*
+                FileOutputStream outputStream;
+                outputStream = openFileOutput(dbExport.fileName, Context.MODE_WORLD_READABLE);
+                outputStream.write(null);
+                outputStream.close();
+                */
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            dbExport.writeCsvFile();
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -399,6 +421,10 @@ public class MainActivity extends Activity {
         int id = item.getItemId();
         if (id == R.id.action_sums) {
             calcShowSumsByVendor();
+            return true;
+        }
+        if (id == R.id.action_export) {
+            exportDBToCsv();
             return true;
         }
         return super.onOptionsItemSelected(item);
