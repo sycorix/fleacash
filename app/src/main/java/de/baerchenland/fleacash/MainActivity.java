@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -395,21 +396,29 @@ public class MainActivity extends Activity {
 
     private void exportDBToCsv() {
         DBExport dbExport = new DBExport();
+        DBHandler dbHandler = new DBHandler(this, null, null, 1);
+        ArrayList vendorItems;
+
+        // get list of calculated sums
+        vendorItems = dbHandler.getVendorSums();
+
+        // getFilesDir() = internal directory for your app
+        // /data/data/de.baerchenland.fleacash/files/fleacash.csv
+        // getExternalFilesDir(null) = absolute path to the directory on the primary external filesystem
+        // /storage/emulated/0/Android/data/de.baerchenland.fleacash/files/fleacash.csv
+        // Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        // /storage/emulated/0/Download/fleacash.csv
+        // File file = new File(context.getExternalFilesDir(null), dbExport.fileName);
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), dbExport.fileNameSum);
         if (dbExport.isExternalStorageWritable()) {
             try {
                 // make new file
-                File file = new File(dbExport.fileName);
                 file.createNewFile();
-                /*
-                FileOutputStream outputStream;
-                outputStream = openFileOutput(dbExport.fileName, Context.MODE_WORLD_READABLE);
-                outputStream.write(null);
-                outputStream.close();
-                */
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            dbExport.writeCsvFile();
+            dbExport.writeCsvFile(file, vendorItems);
+            //TODO: Toast...
         }
     }
 

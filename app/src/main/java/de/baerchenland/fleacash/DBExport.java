@@ -7,6 +7,7 @@ import android.os.Environment;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.util.ArrayList;
 
 /**
  * Created by steffen on 25.10.14.
@@ -19,7 +20,8 @@ import au.com.bytecode.opencsv.CSVWriter;
 public class DBExport {
 
     static String sdDir = Environment.getExternalStorageDirectory().getAbsolutePath();
-    static String fileName = sdDir + File.separator + "fleacash.csv";
+    // static String fileName = sdDir + File.separator + "fleacash.csv";
+    static String fileNameSum = "fleacashsum.csv";
     // Not sure if the / is on the path or not
     // static File outfile = new File(sdDir + File.separator + fileName);
 
@@ -38,32 +40,28 @@ public class DBExport {
         return false;
     }
 
-    public static void writeCsvFile() {
+    public static void writeCsvFile(File file, ArrayList vendorItems) {
+        final ArrayList localItems;
+        localItems = vendorItems;
         // CSVWriter will be closed after end of processing
         try {
-            csv.write(fileName, new CSVWriteProc() {
+            csv.write(file, new CSVWriteProc() {
                 public void process(CSVWriter out) {
-                    out.writeNext("Header1", "Header2");
-                    out.writeNext("v11", "v12");
-                    out.writeNext("v21", "v22");
+                    Integer index;
+                    CashItem item;
+
+                    out.writeNext("Vendor", "Amount");
+                    for(index = 0; index < localItems.size(); index++)
+                    {
+                        item = (CashItem)localItems.get(index);
+                        out.writeNext(item.getVendorFormated(), item.getAmountFormated());
+
+                    }
+
                 }
             });
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
-//    Environment.getExternalStorageDirectory().getPath()
-//    File exportDir = new File(Environment.getExternalStorageDirectory(), "");
-//    if (!exportDir.exists())
-//    {
-//        exportDir.mkdirs();
-//    }
-
-//    File file = new File(exportDir, "csvname.csv");
-
-    /*
-    java.sql.ResultSet myResultSet = ....
-    writer.writeAll(myResultSet, includeHeaders);
-     */
 }
