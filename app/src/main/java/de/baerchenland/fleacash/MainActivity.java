@@ -6,23 +6,18 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Environment;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
-import android.widget.GridView;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -41,8 +36,6 @@ public class MainActivity extends Activity {
     CashItem cashItem;
     String itemTimeStamp;
     ListAdapter listAdapter;
-    PopupWindow removeItemPopup;
-    Button btnClosePopup;
     NumberFormat numberFormat;
     Boolean vendorNumKey;
     Boolean itemDone;
@@ -397,10 +390,12 @@ public class MainActivity extends Activity {
     private void exportDBToCsv() {
         DBExport dbExport = new DBExport();
         DBHandler dbHandler = new DBHandler(this, null, null, 1);
-        ArrayList vendorItems;
+        ArrayList vendorItemsSum;
+        ArrayList vendorItemsAll;
 
         // get list of calculated sums
-        vendorItems = dbHandler.getVendorSums();
+        vendorItemsSum = dbHandler.getVendorSums();
+        vendorItemsAll = dbHandler.getVendorAll();
 
         // getFilesDir() = internal directory for your app
         // /data/data/de.baerchenland.fleacash/files/fleacash.csv
@@ -409,17 +404,21 @@ public class MainActivity extends Activity {
         // Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         // /storage/emulated/0/Download/fleacash.csv
         // File file = new File(context.getExternalFilesDir(null), dbExport.fileName);
-        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), dbExport.fileNameSum);
-        if (dbExport.isExternalStorageWritable()) {
+        File fileSum = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), DBExport.fileNameSum);
+        File fileAll = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), DBExport.fileNameAll);
+
+        if (DBExport.isExternalStorageWritable()) {
             try {
-                // make new file
-                file.createNewFile();
+                DBExport.writeCsvFileSum(fileSum, vendorItemsSum);
+                DBExport.writeCsvFileAll(fileAll, vendorItemsAll);
+                Toast.makeText(MainActivity.this, "Export erfolgreich.", Toast.LENGTH_LONG).
+                        show();
             } catch (Exception e) {
                 e.printStackTrace();
+                Toast.makeText(MainActivity.this, "Export gescheitert: " + e.getMessage(), Toast.LENGTH_LONG).
+                        show();
             }
-            dbExport.writeCsvFile(file, vendorItems);
-            //TODO: Toast...
-        }
+       }
     }
 
     @Override

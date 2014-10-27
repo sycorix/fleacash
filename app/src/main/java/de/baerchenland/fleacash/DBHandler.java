@@ -6,11 +6,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Locale;
 
 /**
+ * Database handler
+ *
  * Created by steffen on 19.10.14.
  */
 public class DBHandler extends SQLiteOpenHelper {
@@ -73,5 +73,22 @@ public class DBHandler extends SQLiteOpenHelper {
         }
         db.close();
         return vendorSumList;
+    }
+
+    public ArrayList getVendorAll() {
+        ArrayList vendorList = new ArrayList();
+        CashItem vendor;
+        Integer index;
+        String query = "SELECT " + COLUMN_VENDOR + ", " + COLUMN_AMOUNT + ", " + COLUMN_TIMESTAMP + " FROM " + TABLE_CASHITEMS + " ORDER BY " + COLUMN_TIMESTAMP + ", " + COLUMN_VENDOR ;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        index = 0;
+        while(cursor.moveToNext()) {
+            index++;
+            vendor = new CashItem(cursor.getString(2), cursor.getInt(0), cursor.getDouble(1));
+            vendorList.add(vendor);
+        }
+        db.close();
+        return vendorList;
     }
 }

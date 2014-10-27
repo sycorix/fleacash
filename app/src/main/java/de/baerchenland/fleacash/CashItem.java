@@ -3,6 +3,8 @@ package de.baerchenland.fleacash;
 import java.util.Locale;
 
 /**
+ * Cash Item Object
+ *
  * Created by steffen on 18.10.14.
  */
 public class CashItem {
@@ -10,10 +12,6 @@ public class CashItem {
     private String _timestamp;
     private int _vendor;
     private double _amount;
-
-    public CashItem() {
-
-    }
 
     public CashItem(String timestamp, int vendor, double amount) {
         this._timestamp = timestamp;
@@ -41,6 +39,10 @@ public class CashItem {
         return String.format("%3d", this._vendor);
     }
 
+    public String getVendorCsv() {
+        return String.format("%d", this._vendor);
+    }
+
     public void setAmount(double amount) {
         this._amount = amount;
     }
@@ -51,6 +53,10 @@ public class CashItem {
 
     public String getAmountFormated() {
         return String.format(Locale.GERMAN, "%6.2f", this._amount);
+    }
+
+    public String getAmountCsv() {
+        return String.format(Locale.ROOT, "%.2f", this._amount);
     }
 
     public String getInfo() {
