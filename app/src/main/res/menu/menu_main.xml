@@ -4,4 +4,10 @@
         android:orderInCategory="100" android:showAsAction="never" />
     <item android:id="@+id/action_export" android:title="Export nach CSV"
         android:orderInCategory="100" android:showAsAction="never" />
+    <item
+        android:id="@+id/menu_item_share"
+        android:showAsAction="ifRoom"
+        android:title="Share"
+        android:actionProviderClass=
+            "android.widget.ShareActionProvider" />
 </menu>

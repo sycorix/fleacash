@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.Menu;
@@ -14,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.ShareActionProvider;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,6 +29,7 @@ import java.util.Locale;
 public class MainActivity extends Activity {
 
     final Context context = this;
+    private ShareActionProvider mShareActionProvider;
     public String textAmount = "";
     public String textVendor = "";
     TextView textViewAmount;
@@ -40,6 +43,7 @@ public class MainActivity extends Activity {
     Boolean vendorNumKey;
     Boolean itemDone;
     Boolean freshItem;
+    String itemListSum;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,21 +81,51 @@ public class MainActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        // Locate MenuItem with ShareActionProvider
+        MenuItem item = menu.findItem(R.id.menu_item_share);
+
+        // Fetch and store ShareActionProvider
+        mShareActionProvider = (ShareActionProvider) item.getActionProvider();
+
+        setShareIntent(makeShareIntent(""));
+
         return true;
+    }
+
+    // Call to update the share intent
+    private void setShareIntent(Intent shareIntent) {
+        if (mShareActionProvider != null) {
+            mShareActionProvider.setShareIntent(shareIntent);
+        }
+    }
+
+    private Intent makeShareIntent(String textContent) {
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_SUBJECT, "Beleg");
+        sendIntent.putExtra(Intent.EXTRA_TEXT, textContent);
+        sendIntent.setType("text/plain");
+        return sendIntent;
     }
 
     public void calcItemSum() {
         double sum = 0;
         int index;
         CashItem item;
+        String receipt = "";
         for(index = 0; index < itemList.size(); index++)
         {
             item = (CashItem)itemList.get(index);
             sum = sum + item.getAmount();
+            receipt = receipt + item.getVendorFormated() + ": " + String.format(Locale.GERMAN, "%6.2f", item.getAmount()) + "\n";
         }
         // set ui
         TextView textSum = (TextView) findViewById(R.id.textViewSum);
-        textSum.setText(String.format(Locale.GERMAN, "%6.2f", sum));
+        itemListSum = String.format(Locale.GERMAN, "%6.2f", sum);
+        textSum.setText(itemListSum);
+        receipt = receipt + "Summe:  " + itemListSum;
+        setShareIntent(makeShareIntent(receipt));
     }
 
     public String getCurrentTimeStamp() {
