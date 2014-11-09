@@ -14,7 +14,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.PopupWindow;
 import android.widget.ShareActionProvider;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,7 +34,7 @@ public class MainActivity extends Activity {
     TextView textViewAmount;
     TextView textViewVendor;
     ListView listView;
-    ArrayList itemList;
+    ArrayList<CashItem> itemList;
     CashItem cashItem;
     String itemTimeStamp;
     ListAdapter listAdapter;
@@ -56,7 +55,7 @@ public class MainActivity extends Activity {
         numberFormat = NumberFormat.getInstance(Locale.GERMAN);
 
         // Array of values to show in ListView
-        itemList = new ArrayList();
+        itemList = new ArrayList<CashItem>();
 
         listAdapter = new de.baerchenland.fleacash.ListAdapter(this, itemList);
         listView = (ListView) findViewById(R.id.listViewAmount);
@@ -116,8 +115,9 @@ public class MainActivity extends Activity {
         String receipt = "";
         for(index = 0; index < itemList.size(); index++)
         {
-            item = (CashItem)itemList.get(index);
+            item = itemList.get(index);
             sum = sum + item.getAmount();
+            // create receipt for share intent
             receipt = receipt + item.getVendorFormated() + ": " + String.format(Locale.GERMAN, "%6.2f", item.getAmount()) + "\n";
         }
         // set ui
@@ -219,53 +219,41 @@ public class MainActivity extends Activity {
 
     public void buttonAmountOnClick(View v) {
         Button button=(Button) v;
-        Boolean numberEntry = false;
 
         switch(button.getId()) {
             case R.id.button10:
                 textAmount += "0";
-                numberEntry = true;
                 break;
             case R.id.button11:
                 textAmount += "1";
-                numberEntry = true;
                 break;
             case R.id.button12:
                 textAmount += "2";
-                numberEntry = true;
                 break;
             case R.id.button13:
                 textAmount += "3";
-                numberEntry = true;
                 break;
             case R.id.button14:
                 textAmount += "4";
-                numberEntry = true;
                 break;
             case R.id.button15:
                 textAmount += "5";
-                numberEntry = true;
                 break;
             case R.id.button16:
                 textAmount += "6";
-                numberEntry = true;
                 break;
             case R.id.button17:
                 textAmount += "7";
-                numberEntry = true;
                 break;
             case R.id.button18:
                 textAmount += "8";
-                numberEntry = true;
                 break;
             case R.id.button19:
                 textAmount += "9";
-                numberEntry = true;
                 break;
             case R.id.button1c:
                 if (!textAmount.contains(",")) {
                     textAmount += ",";
-                    numberEntry = true;
                 }
                 break;
             case R.id.button1cl:
@@ -320,7 +308,7 @@ public class MainActivity extends Activity {
         timeStamp = getCurrentTimeStamp();
         for(index = 0; index < itemList.size(); index++)
         {
-            item = (CashItem)itemList.get(index);
+            item = itemList.get(index);
             dbHandler.addCashItem(item, timeStamp);
         }
         // clear item list
@@ -422,7 +410,7 @@ public class MainActivity extends Activity {
     }
 
     private void exportDBToCsv() {
-        DBExport dbExport = new DBExport();
+        //DBExport dbExport = new DBExport();
         DBHandler dbHandler = new DBHandler(this, null, null, 1);
         ArrayList vendorItemsSum;
         ArrayList vendorItemsAll;
@@ -431,13 +419,13 @@ public class MainActivity extends Activity {
         vendorItemsSum = dbHandler.getVendorSums();
         vendorItemsAll = dbHandler.getVendorAll();
 
+        // Alternate storage locations and how to find them
         // getFilesDir() = internal directory for your app
-        // /data/data/de.baerchenland.fleacash/files/fleacash.csv
+        //      /data/data/de.baerchenland.fleacash/files/fleacash.csv
         // getExternalFilesDir(null) = absolute path to the directory on the primary external filesystem
-        // /storage/emulated/0/Android/data/de.baerchenland.fleacash/files/fleacash.csv
+        //      /storage/emulated/0/Android/data/de.baerchenland.fleacash/files/fleacash.csv
         // Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        // /storage/emulated/0/Download/fleacash.csv
-        // File file = new File(context.getExternalFilesDir(null), dbExport.fileName);
+        //      /storage/emulated/0/Download/fleacash.csv
         File fileSum = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), DBExport.fileNameSum);
         File fileAll = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), DBExport.fileNameAll);
 
