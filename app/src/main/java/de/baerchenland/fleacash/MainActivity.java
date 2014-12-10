@@ -357,6 +357,7 @@ public class MainActivity extends Activity {
         ArrayList vendorItems;
         Integer index;
         CashItem item;
+        double sumAll;
 
         // get list of calculated sums
         vendorItems = dbHandler.getVendorSums();
@@ -370,11 +371,14 @@ public class MainActivity extends Activity {
             MainActivity.this,
             android.R.layout.select_dialog_singlechoice);
 
+        sumAll = 0.0;
         for(index = 0; index < vendorItems.size(); index++)
         {
             item = (CashItem)vendorItems.get(index);
             arrayAdapter.add(item.getShortInfo());
+            sumAll += item.getAmount();
         }
+        builderSingle.setTitle("Summe pro Verkäufer (Gesamt: " + String.format(Locale.GERMAN, "%6.2f)", sumAll));
 
         builderSingle.setNegativeButton("Ok",
             new DialogInterface.OnClickListener() {
