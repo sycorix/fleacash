@@ -395,6 +395,9 @@ public class MainActivity extends Activity {
                     String strName = arrayAdapter.getItem(which);
                     AlertDialog.Builder builderInner = new AlertDialog.Builder(
                         MainActivity.this);
+                    // TODO:
+                    // take a look at this http://stackoverflow.com/questions/9165322/using-arrayadapter-with-alertdialog-and-setadapter
+                    // for a detailed list instead of a message here
                     builderInner.setMessage(strName);
                     builderInner.setTitle("Verkäufer");
                     builderInner.setPositiveButton("Ok",
