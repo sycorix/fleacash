@@ -54,8 +54,12 @@ public class MainActivity extends Activity {
 
         numberFormat = NumberFormat.getInstance(Locale.GERMAN);
 
+        // try to get the instance back from the last orientation
+        itemList = (ArrayList)getLastNonConfigurationInstance();
         // Array of values to show in ListView
-        itemList = new ArrayList<CashItem>();
+        if (itemList == null) {
+            itemList = new ArrayList<CashItem>();
+        }
 
         listAdapter = new de.baerchenland.fleacash.ListAdapter(this, itemList);
         listView = (ListView) findViewById(R.id.listViewAmount);
@@ -71,9 +75,21 @@ public class MainActivity extends Activity {
             }
         });
 
+        calcItemSum();
         vendorNumKey = false;
         itemDone = false;
         freshItem = false;
+    }
+
+    /**
+     *  The implementation of onRetainNonConfigurationInstance will return an
+     *  instance of someExpensiveObject which we created earlier.  This instance
+     *  will be available to the future instance of SomeActivity.
+     */
+    @Override
+    @Deprecated
+    public Object onRetainNonConfigurationInstance() {
+        return itemList;
     }
 
     @Override
