@@ -75,6 +75,24 @@ public class DBHandler extends SQLiteOpenHelper {
         return vendorSumList;
     }
 
+
+    public ArrayList getVendor100Sums() {
+        ArrayList vendorSumList = new ArrayList();
+        CashItem vendorSum;
+        Integer index;
+        String query = "SELECT " +  COLUMN_VENDOR + ", SUM(" + COLUMN_AMOUNT +") FROM " + TABLE_CASHITEMS + " WHERE " + COLUMN_VENDOR + " > 99 GROUP BY " + COLUMN_VENDOR + " ORDER BY " +COLUMN_VENDOR;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(query, null);
+        index = 0;
+        while(cursor.moveToNext()) {
+            index++;
+            vendorSum = new CashItem(index.toString(), cursor.getInt(0), cursor.getDouble(1));
+            vendorSumList.add(vendorSum);
+        }
+        db.close();
+        return vendorSumList;
+    }
+
     public ArrayList getVendorAll() {
         ArrayList vendorList = new ArrayList();
         CashItem vendor;

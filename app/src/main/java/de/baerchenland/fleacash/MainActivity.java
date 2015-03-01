@@ -432,14 +432,80 @@ public class MainActivity extends Activity {
         builderSingle.show();
     }
 
+    private void calcShowSumsByVendor100() {
+        DBHandler dbHandler = new DBHandler(this, null, null, 1);
+        ArrayList vendorItems;
+        Integer index;
+        CashItem item;
+        double sumAll;
+
+        // get list of calculated sums
+        vendorItems = dbHandler.getVendor100Sums();
+
+        // build popup dialog and show
+        AlertDialog.Builder builderSingle;
+        builderSingle = new AlertDialog.Builder(MainActivity.this);
+        builderSingle.setIcon(R.drawable.ic_launcher);
+        builderSingle.setTitle("Summe pro Verkäufer");
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
+                MainActivity.this,
+                android.R.layout.select_dialog_singlechoice);
+
+        sumAll = 0.0;
+        for(index = 0; index < vendorItems.size(); index++)
+        {
+            item = (CashItem)vendorItems.get(index);
+            arrayAdapter.add(item.getShortInfo());
+            sumAll += item.getAmount();
+        }
+        builderSingle.setTitle("Summe pro Verkäufer ab 100 (Gesamt: " + String.format(Locale.GERMAN, "%6.2f)", sumAll));
+
+        builderSingle.setNegativeButton("Ok",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+        builderSingle.setAdapter(arrayAdapter,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String strName = arrayAdapter.getItem(which);
+                        AlertDialog.Builder builderInner = new AlertDialog.Builder(
+                                MainActivity.this);
+                        // TODO:
+                        // take a look at this http://stackoverflow.com/questions/9165322/using-arrayadapter-with-alertdialog-and-setadapter
+                        // for a detailed list instead of a message here
+                        builderInner.setMessage(strName);
+                        builderInner.setTitle("Verkäufer");
+                        builderInner.setPositiveButton("Ok",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(
+                                            DialogInterface dialog,
+                                            int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+                        builderInner.show();
+                    }
+                });
+
+        builderSingle.show();
+    }
+
     private void exportDBToCsv() {
         //DBExport dbExport = new DBExport();
         DBHandler dbHandler = new DBHandler(this, null, null, 1);
         ArrayList vendorItemsSum;
+        ArrayList vendor100ItemsSum;
         ArrayList vendorItemsAll;
 
         // get list of calculated sums
         vendorItemsSum = dbHandler.getVendorSums();
+        vendor100ItemsSum = dbHandler.getVendor100Sums();
         vendorItemsAll = dbHandler.getVendorAll();
 
         // Alternate storage locations and how to find them
@@ -450,11 +516,13 @@ public class MainActivity extends Activity {
         // Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         //      /storage/emulated/0/Download/fleacash.csv
         File fileSum = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), DBExport.fileNameSum);
+        File file100Sum = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), DBExport.fileName100Sum);
         File fileAll = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), DBExport.fileNameAll);
 
         if (DBExport.isExternalStorageWritable()) {
             try {
                 DBExport.writeCsvFileSum(fileSum, vendorItemsSum);
+                DBExport.writeCsvFileSum(file100Sum, vendor100ItemsSum);
                 DBExport.writeCsvFileAll(fileAll, vendorItemsAll);
                 Toast.makeText(MainActivity.this, "Export erfolgreich.", Toast.LENGTH_LONG).
                         show();
@@ -474,6 +542,10 @@ public class MainActivity extends Activity {
         int id = item.getItemId();
         if (id == R.id.action_sums) {
             calcShowSumsByVendor();
+            return true;
+        }
+        if (id == R.id.action_sums_100) {
+            calcShowSumsByVendor100();
             return true;
         }
         if (id == R.id.action_export) {

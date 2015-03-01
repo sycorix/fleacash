@@ -20,6 +20,7 @@ import static android.os.Environment.*;
 public class DBExport {
 
     static String fileNameSum = "fleacashsum.csv";
+    static String fileName100Sum = "fleacash100sum.csv";
     static String fileNameAll = "fleacash.csv";
 
     private static final CSV csv = CSV
